@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Bash(cat:*)",
+      "Bash(timeout 5 tail:*)",
+      "Bash(timeout 3 tail:*)",
+      "Bash(exit 0)",
+      "Bash(echo '<svg xmlns=\"\"http://www.w3.org/2000/svg\"\" viewBox=\"\"0 0 100 100\"\">\n  <circle cx=\"\"50\"\" cy=\"\"50\"\" r=\"\"48\"\" fill=\"\"#F5F1E8\"\" stroke=\"\"#8B7355\"\" stroke-width=\"\"2\"\"/>\n  <ellipse cx=\"\"50\"\" cy=\"\"50\"\" rx=\"\"14\"\" ry=\"\"18\"\" fill=\"\"#8B7355\"\"/>\n  <circle cx=\"\"50\"\" cy=\"\"35\"\" r=\"\"10\"\" fill=\"\"#5C4A3A\"\"/>\n  <circle cx=\"\"45\"\" cy=\"\"33\"\" r=\"\"2.5\"\" fill=\"\"#F5F1E8\"\"/>\n  <circle cx=\"\"55\"\" cy=\"\"33\"\" r=\"\"2.5\"\" fill=\"\"#F5F1E8\"\"/>\n  <circle cx=\"\"46\"\" cy=\"\"33\"\" r=\"\"1.2\"\" fill=\"\"#3D2C1F\"\"/>\n  <circle cx=\"\"54\"\" cy=\"\"33\"\" r=\"\"1.2\"\" fill=\"\"#3D2C1F\"\"/>\n  <g stroke=\"\"#8B7355\"\" stroke-width=\"\"2.5\"\" fill=\"\"none\"\" stroke-linecap=\"\"round\"\">\n    <path d=\"\"M 36 42 Q 20 38 15 32\"\"/>\n    <path d=\"\"M 36 50 Q 18 50 12 50\"\"/>\n    <path d=\"\"M 36 58 Q 20 62 15 68\"\"/>\n  </g>\n  <g stroke=\"\"#8B7355\"\" stroke-width=\"\"2.5\"\" fill=\"\"none\"\" stroke-linecap=\"\"round\"\">\n    <path d=\"\"M 64 42 Q 80 38 85 32\"\"/>\n    <path d=\"\"M 64 50 Q 82 50 88 50\"\"/>\n    <path d=\"\"M 64 58 Q 80 62 85 68\"\"/>\n  </g>\n  <g stroke=\"\"#D4A5A5\"\" stroke-width=\"\"0.8\"\" fill=\"\"none\"\" opacity=\"\"0.6\"\">\n    <line x1=\"\"70\"\" y1=\"\"20\"\" x2=\"\"75\"\" y2=\"\"15\"\"/>\n    <line x1=\"\"75\"\" y1=\"\"15\"\" x2=\"\"80\"\" y2=\"\"20\"\"/>\n    <line x1=\"\"75\"\" y1=\"\"15\"\" x2=\"\"75\"\" y2=\"\"10\"\"/>\n  </g>\n</svg>')",
+      "Bash(npx eslint:*)",
+      "Bash(node -e:*)"
+    ]
+  }
+}
