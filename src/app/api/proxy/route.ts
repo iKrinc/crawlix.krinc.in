@@ -3,7 +3,7 @@
  * Fetches URLs server-side to bypass browser CORS restrictions
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 // Simple in-memory rate limiting
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -30,24 +30,25 @@ function checkRateLimit(ip: string): boolean {
 export async function GET(request: NextRequest) {
   try {
     // Get client IP for rate limiting
-    const ip = request.headers.get('x-forwarded-for') ||
-               request.headers.get('x-real-ip') ||
-               'unknown';
+    const ip =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
 
     // Check rate limit
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
-        { error: 'Rate limit exceeded. Please try again later.' },
+        { error: "Rate limit exceeded. Please try again later." },
         { status: 429 }
       );
     }
 
     // Get target URL from query params
-    const url = request.nextUrl.searchParams.get('url');
+    const url = request.nextUrl.searchParams.get("url");
 
     if (!url) {
       return NextResponse.json(
-        { error: 'Missing URL parameter' },
+        { error: "Missing URL parameter" },
         { status: 400 }
       );
     }
@@ -58,44 +59,78 @@ export async function GET(request: NextRequest) {
       targetUrl = new URL(url);
     } catch {
       return NextResponse.json(
-        { error: 'Invalid URL format' },
+        { error: "Invalid URL format" },
         { status: 400 }
       );
     }
 
     // Only allow http/https
-    if (targetUrl.protocol !== 'http:' && targetUrl.protocol !== 'https:') {
+    if (targetUrl.protocol !== "http:" && targetUrl.protocol !== "https:") {
       return NextResponse.json(
-        { error: 'Only HTTP/HTTPS URLs are allowed' },
+        { error: "Only HTTP/HTTPS URLs are allowed" },
         { status: 400 }
       );
     }
 
-    // Fetch the target URL with timeout
+    // Fetch the target URL with timeout and HTTP fallback
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-    const response = await fetch(url, {
-      method: 'GET',
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Crawlix SEO Analyzer (https://crawlix.krinc.in)',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-      redirect: 'follow',
-    });
+    let response: Response | null = null;
+    let finalUrl = url;
+
+    // Try HTTPS first, then HTTP if HTTPS fails
+    const urlsToTry = [url];
+    if (url.startsWith("https://")) {
+      urlsToTry.push(url.replace("https://", "http://"));
+    }
+
+    let lastError: Error | null = null;
+
+    for (const attemptUrl of urlsToTry) {
+      try {
+        response = await fetch(attemptUrl, {
+          method: "GET",
+          signal: controller.signal,
+          headers: {
+            "User-Agent": "Crawlix SEO Analyzer (https://crawlix.krinc.in)",
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+          },
+          redirect: "follow",
+        });
+
+        if (response.ok) {
+          finalUrl = attemptUrl;
+          break; // Success, exit the loop
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+
+        // If this is the first attempt (HTTPS) and it failed, continue to HTTP
+        if (attemptUrl === url && url.startsWith("https://")) {
+          continue;
+        }
+
+        // If this was HTTP or the last attempt, break and throw the error
+        break;
+      }
+    }
 
     clearTimeout(timeoutId);
 
-    if (!response.ok) {
+    // Check if we got a successful response
+    if (!response || !response.ok) {
       return NextResponse.json(
-        { error: `Failed to fetch: ${response.status} ${response.statusText}` },
-        { status: response.status }
+        { error: `Failed to fetch: ${lastError?.message || "Unknown error"}` },
+        { status: 500 }
       );
     }
 
-    const html = await response.text();
+    const html = await response!.text();
 
     // Check size limit (10MB)
     const sizeInMB = html.length / 1024 / 1024;
@@ -110,25 +145,28 @@ export async function GET(request: NextRequest) {
     return new NextResponse(html, {
       status: 200,
       headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Cache-Control': 'no-store, must-revalidate',
+        "Content-Type": "text/html; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Cache-Control": "no-store, must-revalidate",
       },
     });
   } catch (error) {
-    console.error('Proxy error:', error);
+    console.error("Proxy error:", error);
 
-    if (error instanceof Error && error.name === 'AbortError') {
+    if (error instanceof Error && error.name === "AbortError") {
       return NextResponse.json(
-        { error: 'Request timeout (30 seconds)' },
+        { error: "Request timeout (30 seconds)" },
         { status: 408 }
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to fetch URL', details: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        error: "Failed to fetch URL",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }
@@ -139,9 +177,9 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
     },
   });
 }

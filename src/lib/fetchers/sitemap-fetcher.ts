@@ -19,84 +19,126 @@ export interface SitemapResult {
 }
 
 /**
- * Fetch sitemap with direct fetch attempt
+ * Fetch sitemap with direct fetch attempt and HTTP fallback
  */
 async function fetchSitemapDirect(
   sitemapUrl: string
-): Promise<{ xmlText: string; success: boolean }> {
-  try {
-    const response = await fetch(sitemapUrl, {
-      method: "GET",
-      headers: {
-        Accept: "application/xml, text/xml",
-      },
-    });
+): Promise<{ xmlText: string; success: boolean; finalUrl: string }> {
+  let lastError: Error | null = null;
 
-    if (response.ok) {
-      const xmlText = await response.text();
-      if (xmlText && xmlText.trim().length > 0) {
-        return { xmlText, success: true };
-      }
-    }
-    return { xmlText: "", success: false };
-  } catch (error) {
-    // Check for CORS error
-    if (
-      error instanceof Error &&
-      (error.message.includes("CORS") ||
-        error.message.includes("Failed to fetch"))
-    ) {
-      console.log("Direct sitemap fetch failed due to CORS, will try proxy...");
-    }
-    return { xmlText: "", success: false };
+  // Try HTTPS first, then HTTP if HTTPS fails
+  const urlsToTry = [sitemapUrl];
+  if (sitemapUrl.startsWith("https://")) {
+    urlsToTry.push(sitemapUrl.replace("https://", "http://"));
   }
+
+  for (const attemptUrl of urlsToTry) {
+    try {
+      const response = await fetch(attemptUrl, {
+        method: "GET",
+        headers: {
+          Accept: "application/xml, text/xml",
+        },
+      });
+
+      if (response.ok) {
+        const xmlText = await response.text();
+        if (xmlText && xmlText.trim().length > 0) {
+          return { xmlText, success: true, finalUrl: attemptUrl };
+        }
+      }
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Check for CORS error
+      if (
+        error instanceof Error &&
+        (error.message.includes("CORS") ||
+          error.message.includes("Failed to fetch"))
+      ) {
+        console.log(
+          "Direct sitemap fetch failed due to CORS, will try proxy..."
+        );
+      }
+
+      // If this is the first attempt (HTTPS) and it failed, continue to HTTP
+      if (attemptUrl === sitemapUrl && sitemapUrl.startsWith("https://")) {
+        continue;
+      }
+
+      // If this was HTTP or the last attempt, break and throw the error
+      break;
+    }
+  }
+
+  return { xmlText: "", success: false, finalUrl: sitemapUrl };
 }
 
 /**
- * Fetch sitemap via proxy
+ * Fetch sitemap via proxy with HTTP fallback
  */
 async function fetchSitemapProxy(
   sitemapUrl: string
-): Promise<{ xmlText: string; success: boolean }> {
-  try {
-    const proxyUrl = `/api/proxy?url=${encodeURIComponent(sitemapUrl)}`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(
-      () => controller.abort(),
-      API_CONFIG.FETCH_TIMEOUT
-    );
+): Promise<{ xmlText: string; success: boolean; finalUrl: string }> {
+  let lastError: Error | null = null;
 
-    const response = await fetch(proxyUrl, {
-      method: "GET",
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      try {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}`);
-      } catch {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-    }
-
-    const xmlText = await response.text();
-
-    if (!xmlText || xmlText.trim().length === 0) {
-      throw new Error("Empty response received");
-    }
-
-    return { xmlText, success: true };
-  } catch (error) {
-    console.error("Proxy sitemap fetch failed:", error);
-    return { xmlText: "", success: false };
+  // Try HTTPS first, then HTTP if HTTPS fails
+  const urlsToTry = [sitemapUrl];
+  if (sitemapUrl.startsWith("https://")) {
+    urlsToTry.push(sitemapUrl.replace("https://", "http://"));
   }
+
+  for (const attemptUrl of urlsToTry) {
+    try {
+      const proxyUrl = `/api/proxy?url=${encodeURIComponent(attemptUrl)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        API_CONFIG.FETCH_TIMEOUT
+      );
+
+      const response = await fetch(proxyUrl, {
+        method: "GET",
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        } catch {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+      }
+
+      const xmlText = await response.text();
+
+      if (!xmlText || xmlText.trim().length === 0) {
+        throw new Error("Empty response received");
+      }
+
+      return { xmlText, success: true, finalUrl: attemptUrl };
+    } catch (error) {
+      console.error("Proxy sitemap fetch failed for", attemptUrl, ":", error);
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // If this is the first attempt (HTTPS) and it failed, continue to HTTP
+      if (attemptUrl === sitemapUrl && sitemapUrl.startsWith("https://")) {
+        continue;
+      }
+
+      // If this was HTTP or the last attempt, break and throw the error
+      break;
+    }
+  }
+
+  return { xmlText: "", success: false, finalUrl: sitemapUrl };
 }
 
 /**
- * Fetch and parse sitemap.xml from a given URL with proxy fallback
+ * Fetch and parse sitemap.xml from a given URL with proxy fallback and HTTP fallback
  */
 export async function fetchSitemap(baseUrl: string): Promise<SitemapResult> {
   try {
@@ -125,7 +167,7 @@ export async function fetchSitemap(baseUrl: string): Promise<SitemapResult> {
           return {
             urls,
             found: true,
-            sitemapUrl,
+            sitemapUrl: result.finalUrl,
             strategy,
           };
         }
