@@ -6,14 +6,14 @@
  * Save data to sessionStorage
  */
 export function saveToSession<T>(key: string, data: T): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
   try {
     const serialized = JSON.stringify(data);
     window.sessionStorage.setItem(key, serialized);
     return true;
   } catch (error) {
-    console.error('Failed to save to sessionStorage:', error);
+    console.error("Failed to save to sessionStorage:", error);
     return false;
   }
 }
@@ -22,7 +22,7 @@ export function saveToSession<T>(key: string, data: T): boolean {
  * Load data from sessionStorage
  */
 export function loadFromSession<T>(key: string): T | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
   try {
     const serialized = window.sessionStorage.getItem(key);
@@ -30,7 +30,7 @@ export function loadFromSession<T>(key: string): T | null {
 
     return JSON.parse(serialized) as T;
   } catch (error) {
-    console.error('Failed to load from sessionStorage:', error);
+    console.error("Failed to load from sessionStorage:", error);
     return null;
   }
 }
@@ -39,13 +39,13 @@ export function loadFromSession<T>(key: string): T | null {
  * Remove data from sessionStorage
  */
 export function removeFromSession(key: string): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
   try {
     window.sessionStorage.removeItem(key);
     return true;
   } catch (error) {
-    console.error('Failed to remove from sessionStorage:', error);
+    console.error("Failed to remove from sessionStorage:", error);
     return false;
   }
 }
@@ -54,13 +54,13 @@ export function removeFromSession(key: string): boolean {
  * Clear all sessionStorage
  */
 export function clearSession(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
   try {
     window.sessionStorage.clear();
     return true;
   } catch (error) {
-    console.error('Failed to clear sessionStorage:', error);
+    console.error("Failed to clear sessionStorage:", error);
     return false;
   }
 }
@@ -69,11 +69,11 @@ export function clearSession(): boolean {
  * Check if sessionStorage is available and working
  */
 export function isSessionStorageAvailable(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
   try {
-    const testKey = '__storage_test__';
-    window.sessionStorage.setItem(testKey, 'test');
+    const testKey = "__storage_test__";
+    window.sessionStorage.setItem(testKey, "test");
     window.sessionStorage.removeItem(testKey);
     return true;
   } catch {
@@ -85,18 +85,84 @@ export function isSessionStorageAvailable(): boolean {
  * Get the size of sessionStorage data in bytes (approximate)
  */
 export function getSessionStorageSize(): number {
-  if (typeof window === 'undefined') return 0;
+  if (typeof window === "undefined") return 0;
 
   try {
     let total = 0;
     for (const key in window.sessionStorage) {
       if (window.sessionStorage.hasOwnProperty(key)) {
-        const value = window.sessionStorage.getItem(key) || '';
+        const value = window.sessionStorage.getItem(key) || "";
         total += key.length + value.length;
       }
     }
     return total * 2; // Each character is 2 bytes in UTF-16
   } catch {
     return 0;
+  }
+}
+
+// === Local Storage Functions ===
+
+/**
+ * Save data to localStorage
+ */
+export function saveToLocal<T>(key: string, data: T): boolean {
+  if (typeof window === "undefined") return false;
+
+  try {
+    const serialized = JSON.stringify(data);
+    window.localStorage.setItem(key, serialized);
+    return true;
+  } catch (error) {
+    console.error("Failed to save to localStorage:", error);
+    return false;
+  }
+}
+
+/**
+ * Load data from localStorage
+ */
+export function loadFromLocal<T>(key: string): T | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const serialized = window.localStorage.getItem(key);
+    if (!serialized) return null;
+
+    return JSON.parse(serialized) as T;
+  } catch (error) {
+    console.error("Failed to load from localStorage:", error);
+    return null;
+  }
+}
+
+/**
+ * Remove data from localStorage
+ */
+export function removeFromLocal(key: string): boolean {
+  if (typeof window === "undefined") return false;
+
+  try {
+    window.localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    console.error("Failed to remove from localStorage:", error);
+    return false;
+  }
+}
+
+/**
+ * Check if localStorage is available and working
+ */
+export function isLocalStorageAvailable(): boolean {
+  if (typeof window === "undefined") return false;
+
+  try {
+    const testKey = "__storage_test__";
+    window.localStorage.setItem(testKey, "test");
+    window.localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
   }
 }
