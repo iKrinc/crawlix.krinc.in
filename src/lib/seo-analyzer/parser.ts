@@ -270,10 +270,10 @@ export function getMainContent(doc: Document): Element | null {
   if (!doc) return null;
 
   // Try semantic HTML5 elements first
-  let main = doc.querySelector('main');
+  const main = doc.querySelector('main');
   if (main) return main;
 
-  let article = doc.querySelector('article');
+  const article = doc.querySelector('article');
   if (article) return article;
 
   // Fallback to body

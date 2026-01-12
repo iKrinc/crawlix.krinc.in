@@ -89,7 +89,7 @@ export function getSessionStorageSize(): number {
 
   try {
     let total = 0;
-    for (let key in window.sessionStorage) {
+    for (const key in window.sessionStorage) {
       if (window.sessionStorage.hasOwnProperty(key)) {
         const value = window.sessionStorage.getItem(key) || '';
         total += key.length + value.length;

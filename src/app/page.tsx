@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { Spinner } from '@/components/ui/Spinner';
 import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { ResultsSection } from '@/components/analyzer/ResultsSection';
 import { downloadJSON } from '@/lib/exporters/json-exporter';
 import { downloadCSV } from '@/lib/exporters/csv-exporter';
@@ -62,12 +61,6 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleReset = () => {
-    setUrl('');
-    setResult(null);
-    setError(null);
   };
 
   const handleExport = (format: ExportFormat, selectedSections: Set<string>) => {
@@ -138,7 +131,7 @@ export default function Home() {
         </motion.div>
 
         <p className="text-lg text-brand-muted mb-10 max-w-2xl mx-auto">
-          Analyze any webpage's SEO instantly in your browser. Check meta tags, content structure, readability, and more - all for free.
+          Analyze any webpage&apos;s SEO instantly in your browser. Check meta tags, content structure, readability, and more - all for free.
         </p>
 
         {/* URL Input Form */}

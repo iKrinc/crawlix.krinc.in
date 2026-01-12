@@ -375,7 +375,7 @@ export function ResultsSection({ result, onExport }: ResultsSectionProps) {
                           )}
                         </div>
                         {img.alt && (
-                          <p className="text-sm text-brand-text mb-2 font-medium">"{img.alt}"</p>
+                          <p className="text-sm text-brand-text mb-2 font-medium">&quot;{img.alt}&quot;</p>
                         )}
                         <div className="flex items-center gap-2">
                           <p className="text-xs text-brand-muted truncate flex-1" title={fullImageUrl}>{fullImageUrl}</p>
