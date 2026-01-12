@@ -111,7 +111,7 @@ export function ResultsSection({ result, onExport }: ResultsSectionProps) {
   return (
     <div className="space-y-6">
       {/* Export & Section Selection */}
-      <Card className="sticky top-4 z-10 bg-white/95 backdrop-blur">
+      <Card className="bg-white">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
             <h4 className="font-bold mb-2">Select Sections to View & Export</h4>

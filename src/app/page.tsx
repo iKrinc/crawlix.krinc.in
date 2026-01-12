@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { SEOAnalysisResult, FetchError } from '@/types/analysis';
 import { fetchHTMLWithFallback } from '@/lib/fetchers';
@@ -16,6 +16,7 @@ import { downloadCSV } from '@/lib/exporters/csv-exporter';
 import { downloadMarkdown } from '@/lib/exporters/markdown-exporter';
 import { downloadText } from '@/lib/exporters/text-exporter';
 import type { ExportOptions } from '@/lib/exporters/json-exporter';
+import { fetchSitemap, type SitemapUrl } from '@/lib/fetchers/sitemap-fetcher';
 
 type ExportFormat = 'json' | 'csv' | 'markdown' | 'text';
 
@@ -24,29 +25,49 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<FetchError | null>(null);
   const [result, setResult] = useState<SEOAnalysisResult | null>(null);
+  const [sitemap, setSitemap] = useState<SitemapUrl[]>([]);
+  const [showSitemap, setShowSitemap] = useState(false);
+  const [analyzedAt, setAnalyzedAt] = useState<string | null>(null);
   const { saveResult } = useSessionStorage();
 
-  const handleAnalyze = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Load saved URL on mount and auto-analyze
+  useEffect(() => {
+    const savedUrl = sessionStorage.getItem('crawlix_last_url');
+    if (savedUrl) {
+      setUrl(savedUrl);
+      // Auto-analyze the saved URL
+      analyzeUrl(savedUrl);
+    }
+  }, []);
 
-    if (!url.trim()) return;
-
+  const analyzeUrl = async (urlToAnalyze: string) => {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    setSitemap([]);
+    setShowSitemap(false);
 
     try {
       // Fetch HTML
-      const fetchResult = await fetchHTMLWithFallback(url.trim());
+      const fetchResult = await fetchHTMLWithFallback(urlToAnalyze.trim());
 
       // Analyze SEO
       const analysis = await analyzeSEO(fetchResult.html, fetchResult.url);
 
       // Save to session
       saveResult(analysis);
+      sessionStorage.setItem('crawlix_last_url', urlToAnalyze);
 
-      // Set result
+      // Set result and timestamp
       setResult(analysis);
+      setAnalyzedAt(new Date().toLocaleString());
+
+      // Fetch sitemap in the background
+      fetchSitemap(fetchResult.url).then(sitemapResult => {
+        if (sitemapResult.found) {
+          setSitemap(sitemapResult.urls);
+        }
+      });
     } catch (err) {
       console.error('Analysis error:', err);
       if (err && typeof err === 'object' && 'type' in err) {
@@ -61,6 +82,18 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAnalyze = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url.trim()) return;
+    await analyzeUrl(url);
+  };
+
+  const handleSitemapUrlClick = (sitemapUrl: string) => {
+    setUrl(sitemapUrl);
+    setShowSitemap(false);
+    analyzeUrl(sitemapUrl);
   };
 
   const handleExport = (format: ExportFormat, selectedSections: Set<string>) => {
@@ -122,10 +155,13 @@ export default function Home() {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mb-8"
         >
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-lofi-brown via-lofi-sage to-lofi-rose bg-clip-text text-transparent">
-            Crawlix - Free SEO Analyzer
+          <h1 className="text-6xl md:text-7xl font-bold mb-3 text-lofi-brown">
+            Crawlix
           </h1>
-          <p className="text-xl md:text-2xl text-brand-muted mb-2">
+          <p className="text-2xl md:text-3xl text-lofi-darkBrown font-medium mb-4">
+            Free SEO Analyzer & Website Audit Tool
+          </p>
+          <p className="text-lg md:text-xl text-brand-muted">
             Your cozy SEO companion for instant website audits
           </p>
         </motion.div>
@@ -230,16 +266,75 @@ export default function Home() {
               className="mb-10"
             >
               <div className="text-center">
-                <h3 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-lofi-brown to-lofi-sage bg-clip-text text-transparent">
+                <h3 className="text-3xl md:text-4xl font-bold mb-3 text-lofi-brown">
                   Analysis Results
                 </h3>
-                <p className="text-brand-muted text-sm md:text-base">
-                  <span className="font-mono text-lofi-brown bg-lofi-sand/40 px-3 py-1 rounded-lg">
-                    {result.url}
-                  </span>
-                </p>
+                <a
+                  href={result.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-mono text-sm md:text-base text-lofi-brown bg-lofi-sand/40 px-3 py-1 rounded-lg hover:bg-lofi-sand/60 transition-colors"
+                >
+                  {result.url}
+                  <span className="text-xs">↗</span>
+                </a>
+                {analyzedAt && (
+                  <p className="text-xs text-brand-muted mt-2">
+                    Analyzed at: {analyzedAt}
+                  </p>
+                )}
+                {sitemap.length > 0 && (
+                  <div className="mt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowSitemap(!showSitemap)}
+                    >
+                      {showSitemap ? 'Hide' : 'View'} Sitemap ({sitemap.length} URLs)
+                    </Button>
+                  </div>
+                )}
               </div>
             </motion.div>
+
+            {/* Sitemap Section */}
+            {showSitemap && sitemap.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-8"
+              >
+                <Card>
+                  <h4 className="text-lg font-bold mb-3 text-lofi-coffee">
+                    Sitemap URLs
+                  </h4>
+                  <div className="max-h-96 overflow-y-auto space-y-2">
+                    {sitemap.map((item, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSitemapUrlClick(item.loc)}
+                        className="w-full text-left p-3 rounded-lg border border-lofi-sand hover:border-lofi-brown hover:bg-lofi-sand/20 transition-all group"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-lofi-coffee group-hover:text-lofi-brown truncate flex-1">
+                            {item.loc}
+                          </span>
+                          <span className="text-xs text-brand-muted ml-2 flex-shrink-0">
+                            Click to analyze
+                          </span>
+                        </div>
+                        {item.lastmod && (
+                          <span className="text-xs text-brand-muted/70 block mt-1">
+                            Last modified: {item.lastmod}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </Card>
+              </motion.div>
+            )}
 
             {/* SEO Score Card */}
             <motion.div
@@ -247,10 +342,10 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <Card className="mb-10 text-center bg-gradient-to-br from-lofi-cream via-white to-lofi-sand/30 border-2 border-lofi-sand shadow-xl">
+              <Card className="mb-10 text-center bg-lofi-cream/50 border-2 border-lofi-sand shadow-xl">
                 <div className="flex flex-col items-center py-6">
                   <div className="text-7xl md:text-8xl font-bold mb-6">
-                    <span className="bg-gradient-to-r from-lofi-brown via-lofi-sage to-lofi-rose bg-clip-text text-transparent">
+                    <span className="text-lofi-brown">
                       {calculateSEOScore(result)}
                     </span>
                     <span className="text-4xl text-brand-muted/50">/100</span>
@@ -279,7 +374,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-lofi-brown to-lofi-sage bg-clip-text text-transparent"
+              className="text-4xl font-bold text-center mb-16 text-lofi-brown"
             >
               What We Analyze
             </motion.h3>
@@ -291,8 +386,8 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.9 + index * 0.05 }}
                 >
-                  <Card hover className="bg-gradient-to-br from-white to-lofi-cream border-2 border-lofi-sand/50 hover:border-lofi-brown/30 transition-all duration-300">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-lofi-brown/10 to-lofi-sage/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Card hover className="bg-lofi-cream/30 border-2 border-lofi-sand/50 hover:border-lofi-brown/30 transition-all duration-300">
+                    <div className="w-14 h-14 rounded-2xl bg-lofi-sand/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <span className="text-3xl">{feature.icon}</span>
                     </div>
                     <h4 className="font-bold text-lg mb-2 text-lofi-coffee">{feature.title}</h4>
@@ -308,7 +403,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.3 }}
-              className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-lofi-sage to-lofi-rose bg-clip-text text-transparent"
+              className="text-4xl font-bold text-center mb-16 text-lofi-brown"
             >
               How It Works
             </motion.h3>
@@ -321,7 +416,7 @@ export default function Home() {
                   transition={{ delay: 1.4 + index * 0.1 }}
                   className="text-center"
                 >
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-lofi-brown to-lofi-sage text-white text-3xl font-bold flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <div className="w-20 h-20 rounded-full bg-lofi-brown text-white text-3xl font-bold flex items-center justify-center mx-auto mb-6 shadow-lg">
                     {index + 1}
                   </div>
                   <h4 className="font-bold text-xl mb-3 text-lofi-coffee">{step.title}</h4>

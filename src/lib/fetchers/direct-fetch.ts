@@ -10,13 +10,26 @@ export async function directFetch(url: string): Promise<FetchResult> {
   const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.FETCH_TIMEOUT);
 
   try {
-    const response = await fetch(url, {
+    let fetchUrl = url;
+    let response = await fetch(fetchUrl, {
       method: 'GET',
       signal: controller.signal,
       headers: {
         'Accept': 'text/html,application/xhtml+xml,application/xml',
       },
     });
+
+    // If HTTPS fails, try HTTP
+    if (!response.ok && fetchUrl.startsWith('https://')) {
+      fetchUrl = fetchUrl.replace('https://', 'http://');
+      response = await fetch(fetchUrl, {
+        method: 'GET',
+        signal: controller.signal,
+        headers: {
+          'Accept': 'text/html,application/xhtml+xml,application/xml',
+        },
+      });
+    }
 
     clearTimeout(timeoutId);
 
@@ -38,7 +51,7 @@ export async function directFetch(url: string): Promise<FetchResult> {
     return {
       html,
       strategy: 'direct',
-      url,
+      url: fetchUrl, // Return the actual URL used (might be HTTP instead of HTTPS)
     };
   } catch (error) {
     clearTimeout(timeoutId);

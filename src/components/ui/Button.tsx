@@ -20,7 +20,7 @@ export function Button({
   const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 focus-ring disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
-    primary: 'bg-gradient-to-r from-lofi-brown via-lofi-sage to-lofi-brown text-white hover:shadow-xl hover:scale-[1.02] active:scale-95 shadow-md bg-size-200 bg-pos-0 hover:bg-pos-100 transition-all',
+    primary: 'bg-lofi-brown text-white hover:bg-lofi-darkBrown hover:shadow-lg active:scale-95 shadow-md transition-all',
     secondary: 'bg-lofi-sage text-white hover:bg-lofi-mint shadow-md hover:shadow-lg',
     outline: 'border-2 border-lofi-brown text-lofi-coffee hover:bg-lofi-brown hover:text-white shadow-sm hover:shadow-md',
     ghost: 'text-lofi-brown hover:bg-lofi-sand/50',
