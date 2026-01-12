@@ -37,7 +37,7 @@ export default function Home() {
   const [sitemap, setSitemap] = useState<SitemapUrl[]>([]);
   const [showSitemap, setShowSitemap] = useState(false);
   const [analyzedAt, setAnalyzedAt] = useState<string | null>(null);
-  const { saveResult } = useSessionStorage();
+  const { saveResult, clearResult } = useSessionStorage();
 
   // Load saved URL on mount and auto-analyze
   useEffect(() => {
@@ -49,10 +49,17 @@ export default function Home() {
     }
   }, []);
 
-  // Clear localStorage when URL becomes empty
+  // Clear localStorage and sessionStorage when URL becomes empty
   useEffect(() => {
-    if (!url.trim()) {
+    if (url.trim() == "") {
       removeFromLocal("crawlix_last_url");
+      clearResult();
+      // Also clear local state
+      setResult(null);
+      setError(null);
+      setSitemap([]);
+      setShowSitemap(false);
+      setAnalyzedAt(null);
     }
   }, [url]);
 
@@ -60,9 +67,17 @@ export default function Home() {
     const newUrl = e.target.value;
     setUrl(newUrl);
 
-    // Clear localStorage if input is emptied
+    // Clear localStorage and sessionStorage if input is emptied
     if (!newUrl.trim()) {
       removeFromLocal("crawlix_last_url");
+      // Clear analysis result from sessionStorage
+      clearResult();
+      // Also clear local state
+      setResult(null);
+      setError(null);
+      setSitemap([]);
+      setShowSitemap(false);
+      setAnalyzedAt(null);
     }
   };
 
