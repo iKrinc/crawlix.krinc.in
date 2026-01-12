@@ -1,0 +1,16 @@
+{
+  "name": "Crawlix - Free SEO Analyzer",
+  "short_name": "Crawlix",
+  "description": "Free SEO analyzer and website audit tool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F1E8",
+  "theme_color": "#8B7355",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

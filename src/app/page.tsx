@@ -121,6 +121,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
         className="text-center max-w-4xl mx-auto mb-20"
+        aria-label="Main hero section"
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -128,11 +129,11 @@ export default function Home() {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mb-8"
         >
-          <h2 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-lofi-brown via-lofi-sage to-lofi-rose bg-clip-text text-transparent">
-            Crawlix
-          </h2>
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-lofi-brown via-lofi-sage to-lofi-rose bg-clip-text text-transparent">
+            Crawlix - Free SEO Analyzer
+          </h1>
           <p className="text-xl md:text-2xl text-brand-muted mb-2">
-            Your cozy SEO companion
+            Your cozy SEO companion for instant website audits
           </p>
         </motion.div>
 
@@ -163,6 +164,7 @@ export default function Home() {
               isLoading={isLoading}
               disabled={isLoading || !url.trim()}
               className="shadow-lg"
+              aria-label="Analyze website SEO"
             >
               {isLoading ? 'Analyzing...' : 'Analyze'}
             </Button>

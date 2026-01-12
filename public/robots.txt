@@ -1,4 +1,12 @@
+# Crawlix - SEO Analyzer
+# https://crawlix.krinc.in
+
 User-agent: *
 Allow: /
+Disallow: /api/
 
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Sitemap location
 Sitemap: https://crawlix.krinc.in/sitemap.xml
