@@ -488,6 +488,68 @@ export default function Home() {
               ))}
             </div>
           </section>
+
+          {/* FAQ Section */}
+          <section id="faq" className="max-w-3xl mx-auto mb-16">
+            <motion.h3
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.7 }}
+              className="text-4xl font-bold text-center mb-12 text-lofi-brown"
+            >
+              Frequently Asked Questions
+            </motion.h3>
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.8 + index * 0.08 }}
+                  className="bg-white/60 backdrop-blur-sm border-2 border-lofi-sand rounded-2xl p-6 hover:border-lofi-brown/30 transition-all"
+                >
+                  <h4 className="font-bold text-lofi-coffee mb-2">{faq.q}</h4>
+                  <p className="text-sm text-brand-muted leading-relaxed">{faq.a}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* Support / Buy Me a Coffee */}
+          <section className="max-w-2xl mx-auto mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.1 }}
+              className="bg-gradient-to-br from-lofi-cream to-lofi-sand/60 border-2 border-lofi-sand rounded-2xl p-8 text-center"
+            >
+              <p className="text-3xl mb-3">☕</p>
+              <h3 className="font-bold text-2xl text-lofi-coffee mb-3">Crawlix is Free Forever</h3>
+              <p className="text-sm text-brand-muted mb-6 max-w-md mx-auto leading-relaxed">
+                No ads, no paywalls, no data collection. If Crawlix saved you time, consider
+                buying me a coffee to keep the project alive and growing.
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {/* TODO: Replace href with your actual Buy Me a Coffee link once set up */}
+                <a
+                  href="https://www.buymeacoffee.com/krinc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-semibold bg-[#FFDD00] text-[#000] hover:opacity-90 px-6 py-3 rounded-xl transition-opacity shadow-md"
+                >
+                  ☕ Buy Me a Coffee
+                </a>
+                <a
+                  href="https://github.com/iKrinc/crawlix.krinc.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-semibold text-lofi-brown border-2 border-lofi-brown hover:bg-lofi-brown/10 px-6 py-3 rounded-xl transition-colors"
+                >
+                  ⭐ Star on GitHub
+                </a>
+              </div>
+            </motion.div>
+          </section>
         </>
       )}
     </div>
@@ -552,5 +614,28 @@ const steps = [
   {
     title: "Get Insights",
     description: "View detailed SEO metrics, issues, and export results.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Is Crawlix really free?",
+    a: "Yes — completely. No paywalls, no premium tier, no credit card required. Crawlix is free to use for everyone, always.",
+  },
+  {
+    q: "Does Crawlix store the URLs I analyze?",
+    a: "No. Everything runs in your browser. The page HTML is fetched and analyzed locally. Nothing is sent to our servers and nothing is logged or stored.",
+  },
+  {
+    q: "Why can't Crawlix analyze some websites?",
+    a: "Some websites block cross-origin requests (CORS) which prevents browsers from fetching their HTML directly. Crawlix uses a fallback proxy for these cases, but heavily protected sites may still be inaccessible.",
+  },
+  {
+    q: "Can I export the results?",
+    a: "Yes! After analyzing a page, you can export the full report as JSON, CSV, Markdown, or plain text. You can also select individual sections to export.",
+  },
+  {
+    q: "Is Crawlix open source?",
+    a: "Yes, the source code is available on GitHub. You can inspect every line, contribute improvements, or report issues directly.",
   },
 ];
