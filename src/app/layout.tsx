@@ -145,9 +145,8 @@ export default function RootLayout({
                 <a href="/contact" className="text-sm text-brand-muted hover:text-lofi-brown px-3 py-1.5 rounded-lg hover:bg-lofi-sand/30 transition-all">
                   Contact
                 </a>
-                {/* TODO: Replace href with your actual Buy Me a Coffee link once set up */}
                 <a
-                  href="https://www.buymeacoffee.com/krinc"
+                  href="https://github.com/sponsors/iKrinc"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-lofi-brown border border-lofi-brown/40 hover:border-lofi-brown hover:bg-lofi-brown/5 px-3 py-1.5 rounded-lg transition-all"
@@ -183,14 +182,13 @@ export default function RootLayout({
                 <p className="text-sm text-brand-muted leading-relaxed mb-4">
                   Free, privacy-first SEO analysis. Analyze any webpage instantly — no signup, no tracking, no data collection.
                 </p>
-                {/* TODO: Replace href with your actual Buy Me a Coffee link once set up */}
                 <a
-                  href="https://www.buymeacoffee.com/krinc"
+                  href="https://github.com/sponsors/iKrinc"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#FFDD00] text-[#000] hover:opacity-90 px-3 py-1.5 rounded-lg transition-opacity"
                 >
-                  ☕ Buy Me a Coffee
+                  ❤️ Sponsor on GitHub
                 </a>
               </div>
 

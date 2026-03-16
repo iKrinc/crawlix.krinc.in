@@ -104,14 +104,13 @@ export default function ContactPage() {
         <p className="text-sm text-brand-muted mb-4 max-w-md mx-auto">
           If Crawlix saved you time, consider supporting the project. It helps keep the tool free and maintained.
         </p>
-        {/* TODO: Replace with your actual Buy Me a Coffee / Ko-fi link once set up */}
         <a
-          href="https://www.buymeacoffee.com/krinc"
+          href="https://github.com/sponsors/iKrinc"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 font-semibold text-white bg-[#FFDD00] text-[#000] hover:opacity-90 px-6 py-3 rounded-xl transition-opacity shadow-md"
         >
-          ☕ Buy Me a Coffee
+          ❤️ Sponsor on GitHub
         </a>
       </div>
 

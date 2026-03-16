@@ -515,7 +515,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Support / Buy Me a Coffee */}
           <section className="max-w-2xl mx-auto mb-16">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -530,14 +529,13 @@ export default function Home() {
                 buying me a coffee to keep the project alive and growing.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
-                {/* TODO: Replace href with your actual Buy Me a Coffee link once set up */}
                 <a
-                  href="https://www.buymeacoffee.com/krinc"
+                  href="https://github.com/sponsors/iKrinc"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 font-semibold bg-[#FFDD00] text-[#000] hover:opacity-90 px-6 py-3 rounded-xl transition-opacity shadow-md"
                 >
-                  ☕ Buy Me a Coffee
+                  ❤️ Sponsor on GitHub
                 </a>
                 <a
                   href="https://github.com/iKrinc/crawlix.krinc.in"

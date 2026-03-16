@@ -125,7 +125,7 @@ Bug reports and feature requests → [GitHub Issues](https://github.com/iKrinc/c
 
 Crawlix is free and always will be. If it saved you time:
 
-☕ [Buy me a coffee](https://www.buymeacoffee.com/krinc) — keeps the project running.
+❤️ [Sponsor on GitHub](https://github.com/sponsors/iKrinc) — keeps the project running.
 
 ---
 
