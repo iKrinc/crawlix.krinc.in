@@ -127,22 +127,22 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col overflow-x-hidden">
         {/* Navigation Header */}
         <header className="sticky top-0 z-50 border-b border-lofi-sand/60 bg-brand-background/90 backdrop-blur-md" role="banner">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-14">
-              <a href="/" className="font-bold text-xl text-lofi-brown hover:opacity-80 transition-opacity">
+              <a href="/" className="font-bold text-xl text-lofi-brown hover:opacity-80 transition-opacity shrink-0">
                 Crawlix
               </a>
               <nav className="flex items-center gap-1 sm:gap-2" aria-label="Main navigation">
-                <a href="/" className="text-sm text-brand-muted hover:text-lofi-brown px-3 py-1.5 rounded-lg hover:bg-lofi-sand/30 transition-all">
+                <a href="/" className="text-sm text-brand-muted hover:text-lofi-brown px-2 sm:px-3 py-1.5 rounded-lg hover:bg-lofi-sand/30 transition-all">
                   Home
                 </a>
-                <a href="/about" className="text-sm text-brand-muted hover:text-lofi-brown px-3 py-1.5 rounded-lg hover:bg-lofi-sand/30 transition-all">
+                <a href="/about" className="text-sm text-brand-muted hover:text-lofi-brown px-2 sm:px-3 py-1.5 rounded-lg hover:bg-lofi-sand/30 transition-all">
                   About
                 </a>
-                <a href="/contact" className="text-sm text-brand-muted hover:text-lofi-brown px-3 py-1.5 rounded-lg hover:bg-lofi-sand/30 transition-all">
+                <a href="/contact" className="text-sm text-brand-muted hover:text-lofi-brown px-2 sm:px-3 py-1.5 rounded-lg hover:bg-lofi-sand/30 transition-all">
                   Contact
                 </a>
                 <a
